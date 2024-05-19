@@ -20,8 +20,9 @@ const LoginPage = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Login failed');
-      }
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
+      }      
 
       // Assuming your API sends back the JWT token
       const { token } = await response.json();

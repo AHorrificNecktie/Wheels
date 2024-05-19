@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import clientPromise from '../../../utils/mongodb'; // Import the MongoDB client connection
+import { connectToDatabase } from '../../../utils/mongodb';  // Update the import path as necessary
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -18,8 +18,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return;
     }
 
-    const client = await clientPromise;
-    const db = client.db();
+    const { db } = await connectToDatabase(); // Use connectToDatabase to get the db instance
     const user = await db.collection('users').findOne({ username });
 
     if (!user) {
@@ -37,7 +36,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (!process.env.JWT_SECRET) {
       throw new Error('JWT_SECRET is not defined');
     }
-    
+
     const token = jwt.sign(
       { userId: user._id, username: user.username, role: user.role },
       process.env.JWT_SECRET,
